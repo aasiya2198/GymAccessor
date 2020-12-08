@@ -1,2 +1,0 @@
-module Gym_Accessor {
-}
