@@ -97,5 +97,28 @@ public class HostAgent extends Agent
 		
 		System.out.println("Slot Initialized : "+numberOfSlot+" : slotLimit is : "+slotLimit);
 	}
+	
+	private void RegisterForService()
+	{
+		DFAgentDescription dfd = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("GymHost");
+		sd.setName(getName());
+		sd.setOwnership("ExampleofJADE");
+		dfd.addServices(sd);
+		dfd.setName(getAID());
+		dfd.addOntologies("Test_Example");
+		try
+		{
+			DFService.register(this, dfd);
+		}
+		catch(FIPAException e)
+		{
+			System.err.println(getLocalName()+"Host Successfull");
+			doDelete();
+		}
+	}
+	
+	
 
 }
