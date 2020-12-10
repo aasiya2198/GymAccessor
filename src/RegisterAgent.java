@@ -54,3 +54,35 @@ public class RegisterAgent extends Agent
 			doDelete();
 		}
 	}
+	private class GetHostBehaviour extends Behaviour
+		{
+			boolean isDone = false;
+			@Override
+			public void action() {
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("GymHost");
+			template.addServices(sd);
+			
+			DFAgentDescription[] result = null;
+			try {
+				result = DFService.search(myAgent, template);
+			} catch (FIPAException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(result.length >= 1)
+				hostAgent = result[0].getName();
+			
+			//isDone = true;
+		}
+
+		@Override
+		public boolean done() {
+			// TODO Auto-generated method stub
+			removeBehaviour(this);
+			return isDone;
+			}
+
+		}
+	
