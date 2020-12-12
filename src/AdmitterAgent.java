@@ -74,5 +74,72 @@ public class AdmitterAgent extends Agent
 		}
 
 	}
+	
+	
+	private class RespondToUserRegisterationBehaviour extends CyclicBehaviour
+	{
 
+		private int step = 0;
+		ACLMessage userReply = null;
+		MessageTemplate messageTemplate = null;
+		@Override
+		public void action() {
+			switch(step)
+			{
+			case 0:
+				MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
+				ACLMessage msg = myAgent.receive(mt);
+				ACLMessage aclHost = null;
+				if(msg != null && msg.getConversationId().equals("User-Admitter"))
+				{
+					//System.out.println("Comm with Admitter-User");
+					userReply = msg.createReply();
+					aclHost = new ACLMessage(ACLMessage.CFP);
+					aclHost.setConversationId("Admitter");
+					aclHost.addReceiver(hostAgent);
+					try {
+						aclHost.setContentObject(msg.getContentObject());
+					} catch (IOException | UnreadableException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					myAgent.send(aclHost);
+					messageTemplate = MessageTemplate.and(MessageTemplate.MatchConversationId("Admitter"),
+							MessageTemplate.MatchInReplyTo(aclHost.getReplyWith()));
+					step = 1;
+					UserDetail user = null;
+					try {
+						user = (UserDetail)msg.getContentObject();
+					} catch (UnreadableException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				
+				break;
+			case 1:
+				ACLMessage reply = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CFP));
+				if(reply != null && reply.getConversationId().equals("Admitter"))
+				{
+					
+					//System.out.println("The entering result is : "+reply.getConversationId()+" : "+reply.getContent().toString());
+					userReply.setContent(reply.getContent());
+					myAgent.send(userReply);
+					step = 0;
+					userReply = null;
+					messageTemplate = null;
+				}
+				break;
+			}
+			
+		}
+
+//		@Override
+//		public boolean done() {
+//			// TODO Auto-generated method stub
+//			return false;
+//		}
+		
+	}
 }
+
